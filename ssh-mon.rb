@@ -11,10 +11,15 @@ options = {
     time: DEFAULT_LOCK_TIME
 }
 
-def update_sshmon_config(max_attempts, lock_time, bookmark)
-    update_value_in_file(CONFIG_FILE, "MAX_ATTEMPTS", max_attempts)
-    update_value_in_file(CONFIG_FILE, "LOCK_TIME", lock_time)
-    update_value_in_file(CONFIG_FILE, "LOG_BOOKMARK", bookmark)
+def create_sshmon_config(max_attempts, lock_time, bookmark)
+    File.open(CONFIG_FILE, 'w') { |file|
+        config = [
+            "MAX_ATTEMPTS=#{max_attempts}",
+            "LOCK_TIME=#{lock_time}",
+            "LOG_BOOKMARK=#{bookmark}"
+        ]
+        file.write(config.join("\n"))
+    }
 end
 
 def get_most_recent_fail(current_time)
@@ -36,12 +41,12 @@ OptionParser.new do |opts|
     end
 end.parse!
 
-update_sshmon_config(options[:attempt], options[:time], 0)
+create_sshmon_config(options[:attempt], options[:time], 0)
 
-most_recent_fail = nil
 # current_time = Time.now.strftime("%b %d %H:%M:%S")  
 current_time = "Jan 21 07:15:03"
 
+most_recent_fail = nil
 while true
     current_fail_line = get_most_recent_fail(current_time) # Get the log for current failed attempt
     
