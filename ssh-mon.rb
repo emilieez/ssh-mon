@@ -18,8 +18,8 @@ def update_sshmon_config(max_attempts, lock_time, bookmark)
 end
 
 def get_most_recent_fail(current_time)
-    line_num = get_new_log_bookmark(current_time)
-    auth_log_line = `sed -n \'#{line_num}p\' < #{AUTH_LOG}`
+    line_num = get_new_log_bookmark(current_time) # line num of the most recent fail
+    auth_log_line = `sed -n \'#{line_num}p\' < #{AUTH_LOG}` # info/content of the most recent fail
     return {
         line_num: line_num,
         log_content: auth_log_line
