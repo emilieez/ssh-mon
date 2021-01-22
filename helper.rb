@@ -20,19 +20,19 @@ def remove_whitespace(string)
     return string.to_s.gsub(/\s+/,"")
 end
 
-def get_current_time_linenum_in_log(time)
+def get_most_recent_fail(time)
     log_bookmark = get_value_from_file(CONFIG_FILE, "LOG_BOOKMARK").gsub(/\s+/,"").to_i
 
     if log_bookmark >= 1
         # Only look in the content after log bookmark
-        line_offset = `tail -n +#{log_bookmark} #{AUTH_LOG} | awk '/#{time}/{ print NR; exit }'`
-        log_line_number = log_bookmark + line_offset.to_i
+        line_offset = `tail -n +#{log_bookmark} #{AUTH_LOG} | awk '/Failed password/{ print NR; exit }'`
+        log_line_number = log_bookmark + line_offset.to_i - 1
     else
         # Look in the entire log file
         log_line_number = `awk \'/#{time}/{ print NR; exit }\' #{AUTH_LOG}`
     end
 
-    log_line_number = remove_whitespace(log_line_number)
+    log_line_number = remove_whitespace(log_line_number).to_i
     update_value_in_file(CONFIG_FILE, "LOG_BOOKMARK", log_line_number)
     return log_line_number
 end

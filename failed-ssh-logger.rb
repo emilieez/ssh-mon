@@ -11,7 +11,7 @@ MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i.freeze
 LOCK_TIME = get_value_from_file(CONFIG_FILE, "LOCK_TIME").to_i.freeze
 
 def get_current_fail_line
-    starting_line = get_current_time_linenum_in_log(CURRENT_TIME)
+    starting_line = get_most_recent_fail(CURRENT_TIME)
     auth_log_line = `tail -n +#{starting_line} #{AUTH_LOG} | grep -a -m 1 -h 'Failed password'`
     return auth_log_line
 end
