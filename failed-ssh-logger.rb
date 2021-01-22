@@ -1,23 +1,16 @@
 #!/usr/bin/env ruby
 
 require 'fileutils'
-require_relative "helper.rb"
+require_relative "presets.rb"
+require_relative "logging_utils.rb"
+require_relative "texts_helper.rb"
+
 
 MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i.freeze
 LOCK_TIME = get_value_from_file(CONFIG_FILE, "LOCK_TIME").to_i.freeze
 
 sender_ip = ARGV[0]
 current_time = ARGV[1]
-
-def create_sender_logfile (log_file, num_of_attempts, last_attempt_time)
-    File.open(log_file, 'w') { |file|
-        info = [
-            "CURRENT_ATTEMPTS=#{num_of_attempts}",
-            "LAST_ATTEMPT_TIME=#{last_attempt_time}"
-        ]
-        file.write(info.join("\n"))
-    }
-end
 
 # Save number of login attempts and time of last attempt of a specific IP to a textfile named <ipaddr>"
 # Save the textfile for each IP to a single directory

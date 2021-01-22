@@ -1,35 +1,15 @@
 #!/usr/local/bin/ruby
 
 require 'optparse'
-require_relative 'helper.rb'
+require_relative "presets.rb"
+require_relative "logging_utils.rb"
+require_relative 'texts_helper.rb'
 
-DEFAULT_MAX_ATTEMPT = 3
-DEFAULT_LOCK_TIME = 5
 
 options = {
     attempt: DEFAULT_MAX_ATTEMPT,
     time: DEFAULT_LOCK_TIME
 }
-
-def create_sshmon_config(max_attempts, lock_time, bookmark)
-    File.open(CONFIG_FILE, 'w') { |file|
-        config = [
-            "MAX_ATTEMPTS=#{max_attempts}",
-            "LOCK_TIME=#{lock_time}",
-            "LOG_BOOKMARK=#{bookmark}"
-        ]
-        file.write(config.join("\n"))
-    }
-end
-
-def get_most_recent_fail(current_time)
-    line_num = get_new_log_bookmark(current_time) # line num of the most recent fail
-    auth_log_line = `sed -n \'#{line_num}p\' < #{AUTH_LOG}` # info/content of the most recent fail
-    return {
-        line_num: line_num,
-        log_content: auth_log_line
-    }
-end
 
 OptionParser.new do |opts|
     opts.on("-a", "--attempt 3", Integer, "Max failed attempts") do |attempt|
