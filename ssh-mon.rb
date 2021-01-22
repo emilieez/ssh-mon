@@ -1,6 +1,7 @@
 #!/usr/local/bin/ruby
 
 require 'optparse'
+require_relative 'helper.rb'
 
 DEFAULT_MAX_ATTEMPT = 3
 DEFAULT_LOCK_TIME = 5
@@ -10,15 +11,11 @@ options = {
     time: DEFAULT_LOCK_TIME
 }
 
-def write_to_sshmon_config(enable, max_attempts, lock_time)
-    File.open("ssh_mon_config", 'w') { |file|
-    config = [
-        "ENABLE_SSH_MONITOR=true",
-        "MAX_ATTEMPTS=#{options[:attempt]}",
-        "LOCK_TIME=#{options[:time]}"
-    ]
-    file.write(config.join("\n"))
-}
+def update_sshmon_config(enable, max_attempts, lock_time, bookmark)
+    update_value_in_file(CONFIG_FILE, "ENABLE_SSH_MONITOR", enable)
+    update_value_in_file(CONFIG_FILE, "MAX_ATTEMPTS", max_attempts)
+    update_value_in_file(CONFIG_FILE, "LOCK_TIME", lock_time)
+    update_value_in_file(CONFIG_FILE, "LOG_BOOKMARK", bookmark)
 end
 
 OptionParser.new do |opts|
@@ -31,28 +28,10 @@ OptionParser.new do |opts|
     end
 end.parse!
 
-File.open("ssh_mon_config", 'w') { |file|
-    config = [
-        "ENABLE_SSH_MONITOR=true",
-        "MAX_ATTEMPTS=#{options[:attempt]}",
-        "LOCK_TIME=#{options[:time]}"
-    ]
-    file.write(config.join("\n"))
-}
-
+update_sshmon_config("true", options[:attempt], options[:time], 0)
 until (input = gets.chomp) == 'q' || (input = gets.chomp) == 'Q'
     sleep()
 end
 
-
-File.open("ssh_mon_config", 'w') { |file|
-    config = [
-        "ENABLE_SSH_MONITOR=false",
-        "MAX_ATTEMPTS=#{DEFAULT_MAX_ATTEMPT}",
-        "LOCK_TIME=#{DEFAULT_LOCK_TIME}"
-    ]
-    file.write(config.join("\n"))
-}
+update_sshmon_config("false", DEFAULT_MAX_ATTEMPT, DEFAULT_LOCK_TIME, 0)
 exit()
-
-# env var keep track of last failed login time
