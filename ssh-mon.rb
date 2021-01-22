@@ -21,12 +21,13 @@ OptionParser.new do |opts|
     end
 end.parse!
 
+# Reset config and IP logs directory
 create_sshmon_config(options[:attempt], options[:time], 0)
+system("rm -r #{IP_LOGS_DIR}")
 
-# current_time = Time.now.strftime("%b %d %H:%M:%S")  
-current_time = "Jan 21 07:15:03"
-
+current_time = Time.now.strftime("%b %d %H:%M:%S")  
 most_recent_fail = nil
+
 while true
     current_fail_line = get_most_recent_fail(current_time) # Get the log for current failed attempt
     
