@@ -22,10 +22,13 @@ end
 
 def get_current_time_linenum_in_log(time)
     log_bookmark = get_value_from_file(CONFIG_FILE, "LOG_BOOKMARK").gsub(/\s+/,"").to_i
+
     if log_bookmark >= 1
+        # Only look in the content after log bookmark
         line_offset = `tail -n +#{log_bookmark} #{AUTH_LOG} | awk '/#{time}/{ print NR; exit }'`
         log_line_number = log_bookmark + line_offset.to_i
     else
+        # Look in the entire log file
         log_line_number = `awk \'/#{time}/{ print NR; exit }\' #{AUTH_LOG}`
     end
 

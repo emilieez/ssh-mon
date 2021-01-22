@@ -28,7 +28,7 @@ end
 
 if ENABLE_SSH_MONITOR == "true"
 
-    current_fail_line = get_current_fail_line() # Get the log line for current failed attempt
+    current_fail_line = get_current_fail_line() # Get the log for current failed attempt
     sender_ip = extract_ip_from_line(current_fail_line)
 
     # Save number of login attempts and time of last attempt of a specific IP to a textfile named <ipaddr>"
@@ -42,6 +42,7 @@ if ENABLE_SSH_MONITOR == "true"
 
         if current_attempts >= MAX_ATTEMPTS
             puts "BLOCK IP" #TODO: add firewall block scripts here
+            FileUtils.rm(sender_logs) # reset sender logs
             exit(1)
         else
             current_attempts += 1
@@ -49,6 +50,9 @@ if ENABLE_SSH_MONITOR == "true"
             update_value_in_file(sender_logs, "LAST_ATTEMPT_TIME", CURRENT_TIME) 
         end
     else
+        # Create the sender_log file:
+        #   CURRENT_ATTEMPTS=1
+        #   LAST_ATTEMPT_TIME=<CURRENT TIME>
         create_sender_logfile(sender_logs, 1, CURRENT_TIME)
     end
 else
