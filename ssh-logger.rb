@@ -29,33 +29,54 @@ def write_to_sender_log (log_file, num_of_attempts, last_attempt_time)
     }
 end
 
-def save_log_bookmark (log_line_number)
-    system("sed -i \'s/LOG_BOOKMARK=.*/LOG_BOOKMARK=#{log_line_number}/g\' #{CONFIG_FILE}")
+def update_value_in_file(file, key, new_value) 
+    system("sed -i \'s/#{key}=.*/#{key}=#{new_value}/g\' #{file}")
 end
 
-ENABLE_SSH_MONITOR = get_value_from_file(CONFIG_FILE, "ENABLE_SSH_MONITOR")
-MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i
-LOCK_TIME = get_value_from_file(CONFIG_FILE, "LOCK_TIME")
+def remove_whitespace(string)
+    return string.to_s.gsub(/\s+/,"")
+end
 
-if ENABLE_SSH_MONITOR == "true"
-
+def get_log_line_number
     log_bookmark = get_value_from_file(CONFIG_FILE, "LOG_BOOKMARK").gsub(/\s+/,"").to_i
     if log_bookmark >= 1
         line_offset = `tail -n +#{log_bookmark} #{AUTH_LOG} | awk '/#{CURRENT_TIME}/{ print NR; exit }'`
         log_line_number = log_bookmark + line_offset.to_i
-        save_log_bookmark(log_line_number)
     else
         log_line_number = `awk \'/#{CURRENT_TIME}/{ print NR; exit }\' #{AUTH_LOG}`
-        log_line_number = log_line_number.gsub(/\s+/,"")
-        save_log_bookmark(log_line_number)
     end
-    auth_log_line = `tail -n +#{log_line_number} #{AUTH_LOG} | grep -a -m 1 -h 'Failed password'`
-    
-    # File.open(FAILED_LOG, 'a+') { |file|
-    #     file.puts auth_log_line
-    # }
 
-    sender_ip = auth_log_line.scan(/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/).first
+    log_line_number = remove_whitespace(log_line_number)
+    update_value_in_file(CONFIG_FILE, "LOG_BOOKMARK", log_line_number)
+    return log_line_number
+end
+
+def append_to_file(filename, line)
+    File.open(filename, 'a+') { |file|
+        file.puts line
+    }
+end
+
+def get_current_fail_line
+    starting_line = get_log_line_number()
+    auth_log_line = `tail -n +#{starting_line} #{AUTH_LOG} | grep -a -m 1 -h 'Failed password'`
+    return auth_log_line
+end
+
+def extract_ip(line)
+    return line.scan(/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/).first
+end
+
+ENABLE_SSH_MONITOR = get_value_from_file(CONFIG_FILE, "ENABLE_SSH_MONITOR").freeze
+MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i.freeze
+LOCK_TIME = get_value_from_file(CONFIG_FILE, "LOCK_TIME").freeze
+
+if ENABLE_SSH_MONITOR == "true"
+    current_fail_line = get_current_fail_line()
+
+    append_to_file(FAILED_LOG, current_fail_line)
+    sender_ip = extract_ip(current_fail_line)
+
     sender_logs = "ip_logs/#{sender_ip}"
     if File.exists?(sender_logs)
         current_attempts = get_value_from_file(sender_logs, "CURRENT_ATTEMPTS").to_i
@@ -66,7 +87,8 @@ if ENABLE_SSH_MONITOR == "true"
             exit(1)
         else
             current_attempts += 1
-            write_to_sender_log(sender_logs, current_attempts, CURRENT_TIME)
+            update_value_in_file(sender_logs, "CURRENT_ATTEMPTS", current_attempts)
+            update_value_in_file(sender_logs, "LAST_ATTEMPT_TIME", CURRENT_TIME) 
         end
     else
         write_to_sender_log(sender_logs, 1, CURRENT_TIME)

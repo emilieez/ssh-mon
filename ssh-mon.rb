@@ -10,6 +10,17 @@ options = {
     time: DEFAULT_LOCK_TIME
 }
 
+def write_to_sshmon_config(enable, max_attempts, lock_time)
+    File.open("ssh_mon_config", 'w') { |file|
+    config = [
+        "ENABLE_SSH_MONITOR=true",
+        "MAX_ATTEMPTS=#{options[:attempt]}",
+        "LOCK_TIME=#{options[:time]}"
+    ]
+    file.write(config.join("\n"))
+}
+end
+
 OptionParser.new do |opts|
     opts.on("-a", "--attempt 3", Integer, "Max failed attempts") do |attempt|
         options[:attempt] = attempt
