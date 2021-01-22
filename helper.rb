@@ -20,27 +20,22 @@ def remove_whitespace(string)
     return string.to_s.gsub(/\s+/,"")
 end
 
-def get_most_recent_fail(time)
+def get_new_log_bookmark(time)
     log_bookmark = get_value_from_file(CONFIG_FILE, "LOG_BOOKMARK").gsub(/\s+/,"").to_i
-
-    if log_bookmark >= 1
-        # Only look in the content after log bookmark
-        line_offset = `tail -n +#{log_bookmark} #{AUTH_LOG} | awk '/Failed password/{ print NR; exit }'`
-        log_line_number = log_bookmark + line_offset.to_i - 1
-    else
-        # Look in the entire log file
-        log_line_number = `awk \'/#{time}/{ print NR; exit }\' #{AUTH_LOG}`
+   
+    if log_bookmark == 0
+        # Look in the entire log file to find logs after monitor started
+        log_bookmark = `awk \'/#{time}/{ print NR; exit }\' #{AUTH_LOG}`
+        log_bookmark = remove_whitespace(log_bookmark).to_i
     end
 
-    log_line_number = remove_whitespace(log_line_number).to_i
-    update_value_in_file(CONFIG_FILE, "LOG_BOOKMARK", log_line_number)
-    return log_line_number
-end
-
-def append_to_file(filename, line)
-    File.open(filename, 'a+') { |file|
-        file.puts line
-    }
+    # Only look in the content after log bookmark
+    line_offset = `tail -n +#{log_bookmark} #{AUTH_LOG} | awk '/Failed password/{ print NR; exit }'`
+    new_log_bookmark = log_bookmark + line_offset.to_i - 1
+      
+    new_log_bookmark = remove_whitespace(new_log_bookmark).to_i
+    update_value_in_file(CONFIG_FILE, "LOG_BOOKMARK", new_log_bookmark)
+    return new_log_bookmark
 end
 
 def extract_ip_from_line(line)

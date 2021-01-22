@@ -11,11 +11,19 @@ options = {
     time: DEFAULT_LOCK_TIME
 }
 
-def update_sshmon_config(enable, max_attempts, lock_time, bookmark)
-    update_value_in_file(CONFIG_FILE, "ENABLE_SSH_MONITOR", enable)
+def update_sshmon_config(max_attempts, lock_time, bookmark)
     update_value_in_file(CONFIG_FILE, "MAX_ATTEMPTS", max_attempts)
     update_value_in_file(CONFIG_FILE, "LOCK_TIME", lock_time)
     update_value_in_file(CONFIG_FILE, "LOG_BOOKMARK", bookmark)
+end
+
+def get_most_recent_fail(current_time)
+    line_num = get_new_log_bookmark(current_time)
+    auth_log_line = `sed -n \'#{line_num}p\' < #{AUTH_LOG}`
+    return {
+        line_num: line_num,
+        log_content: auth_log_line
+    }
 end
 
 OptionParser.new do |opts|
@@ -28,10 +36,19 @@ OptionParser.new do |opts|
     end
 end.parse!
 
-update_sshmon_config("true", options[:attempt], options[:time], 0)
-until (input = gets.chomp) == 'q' || (input = gets.chomp) == 'Q'
-    sleep()
-end
+update_sshmon_config(options[:attempt], options[:time], 0)
 
-update_sshmon_config("false", DEFAULT_MAX_ATTEMPT, DEFAULT_LOCK_TIME, 0)
-exit()
+most_recent_fail = nil
+# current_time = Time.now.strftime("%b %d %H:%M:%S")  
+current_time = "Jan 21 07:15:03"
+
+while true
+    current_fail_line = get_most_recent_fail(current_time) # Get the log for current failed attempt
+    
+    if !current_fail_line.empty? && !current_fail_line.nil? && most_recent_fail != current_fail_line[:line_num]
+        puts current_fail_line[:log_content]
+        sender_ip = extract_ip_from_line(current_fail_line[:log_content])
+        system("ruby failed-ssh-logger.rb #{sender_ip} \"#{current_time}\"")
+    end
+    most_recent_fail = current_fail_line[:line_num]
+end
