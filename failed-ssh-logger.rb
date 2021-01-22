@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'fileutils'
-require_relative "presets.rb"
-require_relative "logging_utils.rb"
-require_relative "texts_helper.rb"
+require_relative "lib/presets.rb"
+require_relative "lib/logging_utils.rb"
+require_relative "lib/texts_helper.rb"
 
 
 MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i.freeze

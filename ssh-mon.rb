@@ -1,9 +1,9 @@
 #!/usr/local/bin/ruby
 
 require 'optparse'
-require_relative "presets.rb"
-require_relative "logging_utils.rb"
-require_relative 'texts_helper.rb'
+require_relative "lib/presets.rb"
+require_relative "lib/logging_utils.rb"
+require_relative 'lib/texts_helper.rb'
 
 
 options = {
