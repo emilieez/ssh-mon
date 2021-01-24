@@ -37,6 +37,7 @@ if File.exists?(CONFIG_FILE)
         #   LAST_ATTEMPT_TIME=<CURRENT TIME>
         create_sender_logfile(sender_logs, 1, current_time)
     end
+    exit(1)
 else
     exit(0)
 end
