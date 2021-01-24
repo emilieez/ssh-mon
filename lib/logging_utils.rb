@@ -1,10 +1,16 @@
+require 'fileutils'
+
 def get_new_log_bookmark(time)
     log_bookmark = get_value_from_file(CONFIG_FILE, "LOG_BOOKMARK").gsub(/\s+/,"").to_i
    
     if log_bookmark == 0
         # Look in the entire log file to find logs after monitor started
         log_bookmark = `awk \'/#{time}/{ print NR; exit }\' #{AUTH_LOG}`
-        log_bookmark = remove_whitespace(log_bookmark).to_i
+        if log_bookmark.nil? || log_bookmark.empty?
+            return nil # No new logins found at current time
+        else
+            log_bookmark = remove_whitespace(log_bookmark).to_i
+        end
     end
 
     # Only look in the content after log bookmark
@@ -16,7 +22,9 @@ def get_new_log_bookmark(time)
     return new_log_bookmark
 end
 
-def create_sshmon_config(max_attempts, lock_time, bookmark)
+def init_sshmon_config(max_attempts, lock_time, bookmark)
+    FileUtils.rm(CONFIG_FILE) if File.exists?(CONFIG_FILE)
+    FileUtils.rm_rf(IP_LOGS_DIR) if Dir.exists?(IP_LOGS_DIR)
     File.open(CONFIG_FILE, 'w') { |file|
         config = [
             "MAX_ATTEMPTS=#{max_attempts}",
@@ -29,6 +37,7 @@ end
 
 def get_most_recent_fail(current_time)
     line_num = get_new_log_bookmark(current_time) # line num of the most recent fail
+    return nil if line_num.nil?
     auth_log_line = `sed -n \'#{line_num}p\' < #{AUTH_LOG}` # info/content of the most recent fail
     return {
         line_num: line_num,

@@ -14,7 +14,3 @@ end
 def remove_whitespace(string)
     return string.to_s.gsub(/\s+/,"")
 end
-
-def extract_ip_from_line(line)
-    return line.scan(/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/).first
-end
