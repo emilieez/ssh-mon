@@ -33,7 +33,7 @@ while true
     current_fail_line = get_most_recent_fail(current_time) # Get the log for current failed attempt
         
     if !current_fail_line.nil? && !current_fail_line.empty? && most_recent_fail != current_fail_line[:line_num]
-        puts current_fail_line[:log_content]
+        puts current_fail_line[:log_content] + "\n"
         most_recent_fail = current_fail_line[:line_num]
     end
     sleep(5)
