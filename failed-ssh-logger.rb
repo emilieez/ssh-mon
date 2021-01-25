@@ -7,7 +7,6 @@ require_relative "lib/texts_helper.rb"
 
 if File.exists?(CONFIG_FILE)
     MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i.freeze
-    LOCK_TIME = get_value_from_file(CONFIG_FILE, "LOCK_TIME").to_i.freeze
 
     sender_ip = ENV['PAM_RHOST']
     current_time = Time.now.strftime("%b %d %H:%M:%S") 
@@ -23,6 +22,8 @@ if File.exists?(CONFIG_FILE)
 
         if current_attempts >= MAX_ATTEMPTS
             puts "BLOCK IP" #TODO: add firewall block scripts here
+
+            system("ruby block_ip.rb #{sender_ip}")
             FileUtils.rm(sender_logs) # reset sender logs
             exit(1)
         else
