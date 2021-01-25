@@ -36,5 +36,4 @@ while true
         puts current_fail_line[:log_content] + "\n"
         most_recent_fail = current_fail_line[:line_num]
     end
-    sleep(5)
 end
