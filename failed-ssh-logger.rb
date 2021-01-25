@@ -6,9 +6,6 @@ require_relative "lib/logging_utils.rb"
 require_relative "lib/texts_helper.rb"
 
 if File.exists?(CONFIG_FILE)
-
-    system("echo $PAM_RHOST > /var/log/logfile.txt")	
-
     MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i.freeze
     LOCK_TIME = get_value_from_file(CONFIG_FILE, "LOCK_TIME").to_i.freeze
 
