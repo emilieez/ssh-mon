@@ -25,15 +25,19 @@ end.parse!
 init_sshmon_config(options[:attempt], options[:time], 0)
 
 current_time = Time.now.strftime("%b %d %H:%M")  
-puts "Starting SSH Monitor at #{current_time}"
+puts "Starting SSH Monitor at #{current_time}\n"
 
 most_recent_fail = nil
 
 while true
     current_fail_line = get_most_recent_fail(current_time) # Get the log for current failed attempt
-        
+    
     if !current_fail_line.nil? && !current_fail_line.empty? && most_recent_fail != current_fail_line[:line_num]
         puts current_fail_line[:log_content] + "\n"
         most_recent_fail = current_fail_line[:line_num]
     end
+
+    # TODO: print blocked IP logs here
+    # puts "\e[31m etc Blocking IP for 10 seconds."
+    # puts "\e[32m etc Unblocking IP ."
 end
