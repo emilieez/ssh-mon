@@ -9,8 +9,7 @@ if File.exists?(CONFIG_FILE)
     MAX_ATTEMPTS = get_value_from_file(CONFIG_FILE, "MAX_ATTEMPTS").to_i.freeze
     LOCK_TIME = get_value_from_file(CONFIG_FILE, "LOCK_TIME").to_i.freeze
 
-    # sender_ip = ENV['PAM_RHOST']
-    sender_ip = "127.0.0.1"
+    sender_ip = ENV['PAM_RHOST']
     current_time = Time.now.strftime("%b %d %H:%M:%S") 
 
     # Save number of login attempts and time of last attempt of a specific IP to a textfile named <ipaddr>"
