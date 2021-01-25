@@ -24,7 +24,7 @@ end.parse!
 # Reset config and IP logs directory
 init_sshmon_config(options[:attempt], options[:time], 0)
 
-current_time = Time.now.strftime("%b %d %H:%M:%S")  
+current_time = Time.now.strftime("%b %d %H:%M")  
 puts "Starting SSH Monitor at #{current_time}"
 
 most_recent_fail = nil
