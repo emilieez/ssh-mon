@@ -30,10 +30,13 @@ if File.exists?(CONFIG_FILE)
             update_value_in_file(sender_logs, "LAST_ATTEMPT_TIME", current_time) 
         end
     else
-        # Create the sender_log file:
-        #   CURRENT_ATTEMPTS=1
-        #   LAST_ATTEMPT_TIME=<CURRENT TIME>
-        create_sender_logfile(sender_logs, 1, current_time)
+        File.open(sender_logs, 'w') { |file|
+            info = [
+                "CURRENT_ATTEMPTS=1",
+                "LAST_ATTEMPT_TIME=#{current_time}"
+            ]
+            file.write(info.join("\n"))
+        }
     end
     exit(1)
 else

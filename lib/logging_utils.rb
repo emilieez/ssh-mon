@@ -4,7 +4,7 @@ def get_new_log_bookmark(time)
     if log_bookmark == 0
         # Look in the entire log file to find logs after monitor started
         log_bookmark = `awk \'/#{time}/{ print NR; exit }\' #{AUTH_LOG}`
-	if log_bookmark.nil? || log_bookmark.empty?
+	    if log_bookmark.nil? || log_bookmark.empty?
             return nil # No new logins found at current time
         else
             log_bookmark = remove_whitespace(log_bookmark).to_i
@@ -41,15 +41,5 @@ def get_most_recent_fail(current_time)
     return {
         line_num: line_num,
         log_content: auth_log_line
-    }
-end
-
-def create_sender_logfile (log_file, num_of_attempts, last_attempt_time)
-    File.open(log_file, 'w') { |file|
-        info = [
-            "CURRENT_ATTEMPTS=#{num_of_attempts}",
-            "LAST_ATTEMPT_TIME=#{last_attempt_time}"
-        ]
-        file.write(info.join("\n"))
     }
 end
