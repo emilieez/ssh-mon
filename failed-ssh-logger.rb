@@ -21,9 +21,7 @@ if File.exists?(CONFIG_FILE)
         last_attempt_time = get_value_from_file(sender_logs, "LAST_ATTEMPT_TIME")
 
         if current_attempts >= MAX_ATTEMPTS
-            puts "BLOCK IP" #TODO: add firewall block scripts here
-
-            system("ruby #{BLOCK_IP_SCRIPT} #{sender_ip}")
+            system("ruby #{BLOCK_IP_SCRIPT} #{sender_ip} &")
             FileUtils.rm(sender_logs) # reset sender logs
             exit(1)
         else
