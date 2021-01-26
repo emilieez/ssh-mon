@@ -5,7 +5,7 @@ CONFIG_FILE = "/etc/ssh-mon/ssh_mon_config"
 AUTH_LOG = "/var/log/auth.log"
 IP_LOGS_DIR = "/var/log/ip_logs"
 
-BLOCK_IP_SCRIPT = "/etc/ssh-mon/block_ip.rb"
+BLOCK_IP_SCRIPT = "/etc/ssh-mon/pam/block_ip.rb"
 IPTABLES_LOG = "/var/log/iptables_log.txt"
 
 
