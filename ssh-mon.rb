@@ -43,7 +43,7 @@ while true
         curr_iptables_log_size = remove_whitespace(curr_iptables_log_size)
         
         if prev_iptables_log_size != curr_iptables_log_size
-            puts "\e[93m" + `tail -n 1 #{IPTABLES_LOG}`
+            puts `tail -n 1 #{IPTABLES_LOG}`
             prev_iptables_log_size = curr_iptables_log_size
         end
     end
