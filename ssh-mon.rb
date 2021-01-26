@@ -24,14 +24,14 @@ end.parse!
 # Reset config and IP logs directory
 init_sshmon_config(options[:attempt], options[:time], 0)
 
-current_time = Time.now.strftime("%b %d %H:%M")  
-puts "Starting SSH Monitor at #{current_time}\n"
+start_time = Time.now.strftime("%b %d %H:%M")  
+puts "Starting SSH Monitor at #{start_time}\n"
 
 most_recent_fail = nil
 prev_iptables_log_size = nil
 
 while true
-    current_fail_line = get_most_recent_fail(current_time) # Get the log for current failed attempt
+    current_fail_line = get_most_recent_fail(start_time) # Get the log for current failed attempt
     
     if !current_fail_line.nil? && !current_fail_line.empty? && most_recent_fail != current_fail_line[:line_num]
         puts current_fail_line[:log_content] + "\n"
