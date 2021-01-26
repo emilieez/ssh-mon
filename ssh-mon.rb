@@ -28,6 +28,7 @@ current_time = Time.now.strftime("%b %d %H:%M")
 puts "Starting SSH Monitor at #{current_time}\n"
 
 most_recent_fail = nil
+prev_iptables_log_size = nil
 
 while true
     current_fail_line = get_most_recent_fail(current_time) # Get the log for current failed attempt
@@ -37,7 +38,13 @@ while true
         most_recent_fail = current_fail_line[:line_num]
     end
 
-    # TODO: print blocked IP logs here
-    # puts "\e[31m etc Blocking IP for 10 seconds."
-    # puts "\e[32m etc Unblocking IP ."
+    if File.exists?(IPTABLES_LOG)
+        curr_iptables_log_size = `wc -l #{IPTABLES_LOG} | awk '{ print $1 }'`
+        curr_iptables_log_size = remove_whitespace(curr_iptables_log_size)
+        
+        if prev_iptables_log_size != curr_iptables_log_size
+            puts "\e[93m" + `tail -n 1 #{IPTABLES_LOG}`
+            prev_iptables_log_size = curr_iptables_log_size
+        end
+    end
 end

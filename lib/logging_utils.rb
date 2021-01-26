@@ -23,6 +23,8 @@ end
 def init_sshmon_config(max_attempts, lock_time, bookmark)
     system("sudo rm #{CONFIG_FILE}") if File.exists?(CONFIG_FILE)
     system("sudo rm -rf #{IP_LOGS_DIR}") if Dir.exists?(IP_LOGS_DIR)
+    system("sudo rm #{IPTABLES_LOG}") if File.exists?(IPTABLES_LOG)
+
     File.open(CONFIG_FILE, 'w') { |file|
         config = [
             "MAX_ATTEMPTS=#{max_attempts}",
