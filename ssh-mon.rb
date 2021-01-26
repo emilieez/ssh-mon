@@ -47,4 +47,9 @@ while true
             prev_iptables_log_size = curr_iptables_log_size
         end
     end
+
+    trap "SIGINT" do
+        puts "Shutdown Application"
+        exit 130
+    end
 end
