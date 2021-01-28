@@ -8,7 +8,8 @@ require_relative 'lib/texts_helper.rb'
 
 options = {
     attempt: DEFAULT_MAX_ATTEMPT,
-    time: DEFAULT_LOCK_TIME
+    time: DEFAULT_LOCK_TIME,
+    reset: DEFAULT_RESET_FAILED_TIME
 }
 
 OptionParser.new do |opts|
@@ -19,10 +20,13 @@ OptionParser.new do |opts|
     opts.on("-t", "--time 10", Integer, "IP Disable time") do |time|
         options[:time] = time
     end
+    opts.on("-r", "--reset 10", Integer, "Reset failed attempts time") do |reset|
+        options[:reset] = reset
+    end
 end.parse!
 
 # Reset config and IP logs directory
-init_sshmon_config(options[:attempt], options[:time], 0)
+init_sshmon_config(options[:attempt], options[:time], options[:reset])
 
 start_time = Time.now.strftime("%b %d %H:%M:%S") 
 puts "Starting SSH Monitor at #{start_time}\n"

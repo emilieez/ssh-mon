@@ -1,3 +1,4 @@
+
 def get_new_log_bookmark(time)
     log_bookmark = get_value_from_file(CONFIG_FILE, "LOG_BOOKMARK").gsub(/\s+/,"").to_i
    
@@ -20,7 +21,7 @@ def get_new_log_bookmark(time)
     return new_log_bookmark
 end
 
-def init_sshmon_config(max_attempts, lock_time, bookmark)
+def init_sshmon_config(max_attempts, lock_time, reset)
     system("sudo rm #{CONFIG_FILE}") if File.exists?(CONFIG_FILE)
     system("sudo rm -rf #{IP_LOGS_DIR}") if Dir.exists?(IP_LOGS_DIR)
     system("sudo rm #{IPTABLES_LOG}") if File.exists?(IPTABLES_LOG)
@@ -29,7 +30,8 @@ def init_sshmon_config(max_attempts, lock_time, bookmark)
         config = [
             "MAX_ATTEMPTS=#{max_attempts}",
             "LOCK_TIME=#{lock_time}",
-            "LOG_BOOKMARK=#{bookmark}"
+            "LOG_BOOKMARK=0",
+	    "DEFAULT_RESET_FAILED_TIME=#{reset}"
         ]
         file.write(config.join("\n"))
     }

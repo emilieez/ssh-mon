@@ -18,6 +18,7 @@ if File.exists?(CONFIG_FILE)
     if File.exists?(sender_logs)
         current_attempts = get_value_from_file(sender_logs, "CURRENT_ATTEMPTS").to_i
         last_attempt_time = get_value_from_file(sender_logs, "LAST_ATTEMPT_TIME")
+	system("sudo find #{IP_LOGS_DIR}/* -mmin +#{DEFAULT_RESET_FAILED_TIME} -exec rm {} \;)")
 
         if current_attempts >= MAX_ATTEMPTS
             system("ruby #{BLOCK_IP_SCRIPT} #{sender_ip} &")
