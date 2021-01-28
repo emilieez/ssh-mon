@@ -12,5 +12,6 @@ sleep(LOCK_TIME)
 
 system("sudo iptables -D INPUT -s #{sender_ip} -j DROP")
 system("sudo echo \"Unblocking #{sender_ip} ...\" >> #{IPTABLES_LOG}")
+system("sudo rm #{IP_LOGS_DIR}/#{sender_ip}") if File.exists?(" #{IP_LOGS_DIR}/#{sender_ip}")
 
 exit(0)
