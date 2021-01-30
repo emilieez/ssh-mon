@@ -1,5 +1,5 @@
 DEFAULT_MAX_ATTEMPT = 3
-DEFAULT_LOCK_TIME = 5
+DEFAULT_LOCK_TIME = nil
 
 ## clears ip from /var/log/ip_logs
 DEFAULT_RESET_FAILED_TIME = 10
